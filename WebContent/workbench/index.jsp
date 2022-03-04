@@ -42,8 +42,40 @@
 		
 		window.open("workbench/main/index.jsp","workareaFrame");
 		
+		$("#update").click(function(){
+			if($.trim($("#newPwd").val())=="" || $.trim($("#oldPwd").val()) == "" || $.trim($("#confirmPwd").val()) == ""){
+				alert("输入不能为空");
+			}else{
+				if($("#newPwd").val() != $("#confirmPwd").val()){
+					alert("两次输入的新密码不一致,请重新输入")
+				}else{
+					$.ajax({
+						url:"setting/user/updatePwd.do",
+						data:{"newPwd":$("#newPwd").val(),"oldPwd":$("#oldPwd").val()},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							if(data.success){
+								alert("更新密码成功!请重新登录");
+								window.location.href='login.jsp';
+							}else{
+								alert("更新失败!请检查原密码是否正确")
+							}
+						}
+					})
+				}
+			}
+			
+		})
+		
 	});
-	
+		
+	function openEditPwdModal(){
+		$("#newPwd").val("");
+		$("#oldPwd").val("");
+		$("#confirmPwd").val("");
+		$("#editPwdModal").modal("show");
+	}	
 </script>
 </head>
 <body>
@@ -60,12 +92,12 @@
 				</div>
 				<div class="modal-body">
 					<div style="position: relative; left: 40px;">
-						姓名：<b>张三</b><br><br>
-						登录帐号：<b>zhangsan</b><br><br>
+						姓名：<b>${user.name }</b><br><br>
+						登录帐号：<b>${user.loginAct}</b><br><br>
 						组织机构：<b>1005，市场部，二级部门</b><br><br>
-						邮箱：<b>zhangsan@bjpowernode.com</b><br><br>
-						失效时间：<b>2017-02-14 10:10:10</b><br><br>
-						允许访问IP：<b>127.0.0.1,192.168.100.2</b>
+						邮箱：<b>${user.email }</b><br><br>
+						失效时间：<b>${user.expireTime }</b><br><br>
+						允许访问IP：<b>${user.allowIps }(限制解除)</b>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -90,7 +122,7 @@
 						<div class="form-group">
 							<label for="oldPwd" class="col-sm-2 control-label">原密码</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="oldPwd" style="width: 200%;">
+								<input  type="text" class="form-control" id="oldPwd" style="width: 200%;">
 							</div>
 						</div>
 						
@@ -111,7 +143,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='login.html';">更新</button>
+					<button id="update"  type="button" class="btn btn-primary">更新</button>
 				</div>
 			</div>
 		</div>
@@ -132,7 +164,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='login.html';">确定</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='login.jsp';">确定</button>
 				</div>
 			</div>
 		</div>
@@ -140,7 +172,7 @@
 	
 	<!-- 顶部 -->
 	<div id="top" style="height: 50px; background-color: #3C3C3C; width: 100%;">
-		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2017&nbsp;动力节点</span></div>
+		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2022&nbsp;陈伟强</span></div>
 		<div style="position: absolute; top: 15px; right: 15px;">
 			<ul>
 				<li class="dropdown user-dropdown">
@@ -149,10 +181,10 @@
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="settings/index.html"><span class="glyphicon glyphicon-wrench"></span> 系统设置</a></li>
+						<li><a href="settings/index.jsp"><span class="glyphicon glyphicon-wrench"></span> 系统设置</a></li>
 						<li><a href="javascript:void(0)" data-toggle="modal" data-target="#myInformation"><span class="glyphicon glyphicon-file"></span> 我的资料</a></li>
-						<li><a href="javascript:void(0)" data-toggle="modal" data-target="#editPwdModal"><span class="glyphicon glyphicon-edit"></span> 修改密码</a></li>
-						<li><a href="javascript:void(0);" data-toggle="modal" data-target="#exitModal"><span class="glyphicon glyphicon-off"></span> 退出</a></li>
+						<li><a href="javascript:void(0)" data-toggle="modal" onclick="openEditPwdModal()"><span class="glyphicon glyphicon-edit"></span> 修改密码</a></li>
+						<li><a href="javascript:void(0);" data-toggle="modal"  data-target="#exitModal"><span class="glyphicon glyphicon-off"></span> 退出</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -166,16 +198,16 @@
 		<div id="navigation" style="left: 0px; width: 18%; position: relative; height: 100%; overflow:auto;">
 		
 			<ul id="no1" class="nav nav-pills nav-stacked">
-				<li class="liClass"><a href="main/index.html" target="workareaFrame"><span class="glyphicon glyphicon-home"></span> 工作台</a></li>
+				<li class="liClass"><a href="workbench/main/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-home"></span> 工作台</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-tag"></span> 动态</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-time"></span> 审批</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户公海</a></li>
 				<li class="liClass"><a href="workbench/activity/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-play-circle"></span> 市场活动</a></li>
-				<li class="liClass"><a href="clue/index.html" target="workareaFrame"><span class="glyphicon glyphicon-search"></span> 线索（潜在客户）</a></li>
-				<li class="liClass"><a href="customer/index.html" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户</a></li>
-				<li class="liClass"><a href="contacts/index.html" target="workareaFrame"><span class="glyphicon glyphicon-earphone"></span> 联系人</a></li>
-				<li class="liClass"><a href="transaction/index.html" target="workareaFrame"><span class="glyphicon glyphicon-usd"></span> 交易（商机）</a></li>
-				<li class="liClass"><a href="visit/index.html" target="workareaFrame"><span class="glyphicon glyphicon-phone-alt"></span> 售后回访</a></li>
+				<li class="liClass"><a href="workbench/clue/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-search"></span> 线索（潜在客户）</a></li>
+				<li class="liClass"><a href="workbench/customer/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户</a></li>
+				<li class="liClass"><a href="workbench/contacts/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-earphone"></span> 联系人</a></li>
+				<li class="liClass"><a href="workbench/transaction/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-usd"></span> 交易（商机）</a></li>
+				<li class="liClass"><a href="workbench/visit/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-phone-alt"></span> 售后回访</a></li>
 				<li class="liClass">
 					<a href="#no2" class="collapsed" data-toggle="collapse"><span class="glyphicon glyphicon-stats"></span> 统计图表</a>
 					<ul id="no2" class="nav nav-pills nav-stacked collapse">

@@ -11,11 +11,16 @@ import Domain.Setting.User;
 import Exception.LoginException;
 import Services.Setting.UserService;
 
-@Service
+@Service("userService")
 public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	UserDao userDao;
+	
+	@Override
+	public void updatePwd(String id, String newPwd) {
+		userDao.updatePwd(id,newPwd);
+	}
 	
 	@Override
 	public User login(String loginAct, String loginPwd) throws LoginException {
@@ -29,7 +34,7 @@ public class UserServiceImpl implements UserService {
 		if(user == null) {
 			throw new LoginException("ÕËºÅÃÜÂë´íÎó");
 		}
-		if(user.getExpireTime().compareTo(Utils.DateTimeUtil.getSysTime()) >0) {
+		if(user.getExpireTime().compareTo(Utils.DateTimeUtil.getSysTime()) <0) {
 			throw new LoginException("ÕËºÅÒÑÊ§Ð§");
 		}
 		if("0".equals(user.getLockState())) {

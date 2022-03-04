@@ -38,4 +38,18 @@ public class UserController {
 		}
 		return json.toString();
 	}
+	
+	@RequestMapping("/user/updatePwd")
+	@ResponseBody
+	public Object updatePwd(String oldPwd,String newPwd,HttpServletRequest request) {
+		JSONObject json = new JSONObject();
+		User user = (User) request.getSession().getAttribute("user");
+		if(!MD5Util.getMD5(oldPwd).equals(user.getLoginPwd())) {
+			json.put("success", false);
+		}else {
+			userService.updatePwd(user.getId(),MD5Util.getMD5(newPwd));
+			json.put("success", true);
+		}
+		return json.toString();
+	}
 }
