@@ -28,19 +28,20 @@
 
 <script type="text/javascript">
 	$(function() {
+		//选中样式为time的文本框使用bootstart日历插件
+		$(".time").datetimepicker({
+			minView:"month",
+			language:"zh-CN",
+			format:"yyyy-mm-dd",
+			autoclose:true,
+			todayBtn:true,
+			pickerPosition:"bottom-left"
+		})
 
 		$("#addBtn").click(
 				function() {
 					
-					//选中样式为time的文本框使用bootstart日历插件
-					$(".time").datetimepicker({
-						minView:"month",
-						language:"zh-CN",
-						format:"yyyy-mm-dd",
-						autoclose:true,
-						todayBtn:true,
-						pickerPosition:"bottom-left"
-					})
+					
 					
 					$.ajax({
 						url : "workbench/activity/getUserList.do",
@@ -121,7 +122,7 @@
 					$("#hidden-owner").val($.trim($("#search-owner").val()));
 					$("#hidden-startDate").val($.trim($("#search-startDate").val()));
 					$("#hidden-endDate").val($.trim($("#search-endDate").val()));
-					pageList(1,2);
+					pageList(1,8);
 					
 				})
 				
@@ -240,7 +241,7 @@
 					success : function(data) {
 						if(data.success){
 							//更新成功后刷新
-							pageList(1,2);
+							pageList(1,8);
 							//关闭模态窗口
 							$("#editActivityModal").modal("hide");
 							pageList($("#activityPage").bs_pagination('getOption','currentPage'),
@@ -252,7 +253,7 @@
 				})
 			})
 			
-		pageList(1,4);		
+		pageList(1,8);		
 	});
 	
 	/*
@@ -284,7 +285,6 @@
 			success:function(data){
 				var html="";
 				$.each(data.dataList,function(i,n){
-					
 					html += '<tr class="active">';
 					html += '<td><input type="checkbox" name = "xz"  value='+n.id+' /></td>';
 					html += '<td><a style="text-decoration: none; cursor: pointer;"';
@@ -504,14 +504,14 @@
 
 					<div class="form-group">
 						<div class="input-group">
-							<div class="input-group-addon">开始日期</div>
-							<input class="form-control" type="text" id="search-startDate" />
+							<div class="input-group-addon ">开始日期</div>
+							<input class="form-control time" type="text" id="search-startDate" />
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="input-group">
-							<div class="input-group-addon">结束日期</div>
-							<input class="form-control" type="text" id="search-endDate">
+							<div class="input-group-addon ">结束日期</div>
+							<input class="form-control time" type="text" id="search-endDate">
 						</div>
 					</div>
 

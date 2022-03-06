@@ -8,4 +8,8 @@
 	<update id="updatePwd">
 		update tbl_user set loginPwd = #{newPwd} where id = #{id}
 	</update>
+	
+	<select id="getUserList" resultType="Domain.Setting.User">
+		select * from tbl_user
+	</select>
 </mapper>

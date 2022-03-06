@@ -184,9 +184,9 @@
 				<!-- 
 				<a href="org/index.html" style="text-decoration: none; color: red;">组织机构</a>
 				 -->
-				<a href="dept/index.jsp">部门管理</a>
+				<a href="settings/dept/index.jsp">部门管理</a>
 				<br>
-				<a href="qx/index.jsp">权限管理</a>
+				<a href="settings/qx/index.jsp">权限管理</a>
 			</div>
 			
 			<div style="position: relative; width: 33%; height: 50%; left: 33%; top: -100%">
@@ -222,7 +222,7 @@
 			<div style="position: relative; width: 34%; height: 50%; left: 66%; top: -200%">
 				数据管理
 				<br><br>
-				<a href="dictionary/index.jsp">数据字典表</a>
+				<a href="settings/dictionary/index.jsp">数据字典表</a>
 				<br>
 				<a href="javascript:void(0);">导入</a>
 				<br>

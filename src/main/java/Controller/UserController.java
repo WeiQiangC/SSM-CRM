@@ -13,6 +13,7 @@ import Exception.LoginException;
 import Services.Setting.UserService;
 import Utils.MD5Util;
 
+//setting模块
 @Controller
 @RequestMapping("/setting")
 public class UserController {
@@ -20,7 +21,8 @@ public class UserController {
 	@Autowired
 	UserService userService;	
 	
-	@RequestMapping("/user/login.do")
+	//登录方法
+	@RequestMapping("/user/login")
 	@ResponseBody
 	public Object login(String loginAct,String loginPwd,HttpServletRequest request) {
 		loginPwd = MD5Util.getMD5(loginPwd);
@@ -39,6 +41,7 @@ public class UserController {
 		return json.toString();
 	}
 	
+	//修改个人密码
 	@RequestMapping("/user/updatePwd")
 	@ResponseBody
 	public Object updatePwd(String oldPwd,String newPwd,HttpServletRequest request) {

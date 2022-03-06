@@ -17,12 +17,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	UserDao userDao;
 	
-	@Override
 	public void updatePwd(String id, String newPwd) {
 		userDao.updatePwd(id,newPwd);
 	}
 	
-	@Override
 	public User login(String loginAct, String loginPwd) throws LoginException {
 		//·â×°Ìõ¼þ
 		Map<String, String> map = new HashMap<String, String>();
