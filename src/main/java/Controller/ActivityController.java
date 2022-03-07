@@ -1,5 +1,6 @@
 package Controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,9 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import Domain.Setting.User;
 import Domain.Setting.workbench.activity.Activity;
+import Domain.Setting.workbench.activity.ActivityRemark;
 import Services.workbench.activity.ActivityService;
 import Utils.DateTimeUtil;
 import Utils.UUIDUtil;
@@ -26,6 +27,50 @@ public class ActivityController {
 	
 	@Autowired
 	private ActivityService activityService;
+
+	@RequestMapping("/deleteRemark")
+	@ResponseBody
+	public Object deleteRemark(String id) {
+		Boolean flag = activityService.deleteRemark(id);
+		JSONObject json = new JSONObject();
+		json.put("success",flag);
+		return json.toString();
+	}
+	
+	@RequestMapping("/updateRemark")
+	@ResponseBody
+	public Object updateRemark(ActivityRemark remark,HttpServletRequest request) {
+		remark.setEditTime(DateTimeUtil.getSysTime());
+		remark.setEditBy(((User)request.getSession().getAttribute("user")).getName());
+		remark.setEditFlag("1");
+		Boolean flag = activityService.updateRemark(remark);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("success", flag);
+		map.put("ar", remark);
+		return map;
+	}
+	
+	
+	@RequestMapping("/saveRemark")
+	@ResponseBody
+	public Object saveRemark(ActivityRemark remark,HttpServletRequest request) {
+		remark.setId(UUIDUtil.getUUID());
+		remark.setCreateTime(DateTimeUtil.getSysTime());
+		remark.setCreateBy(((User)request.getSession().getAttribute("user")).getName());
+		remark.setEditFlag("0");
+		Boolean flag = activityService.saveRemark(remark);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("success", flag);
+		map.put("ar", remark);
+		return map;
+	}
+	
+	@RequestMapping("/getRemarkListByAid")
+	@ResponseBody
+	public Object getRemarkListByAid(String activityId) {
+		List<ActivityRemark> aList = activityService.getRemarkListByAid(activityId);
+		return aList;
+	}
 	
 	@RequestMapping("/delete")
 	@ResponseBody
@@ -91,7 +136,7 @@ public class ActivityController {
 	public String detail(String id,Model model) {
 		Activity a =  activityService.detail(id);
 		model.addAttribute("a", a);
-		return "forward:/workbench/activity/detail.jsp";
+		return "/workbench/activity/detail.jsp";
 		
 	}
 	

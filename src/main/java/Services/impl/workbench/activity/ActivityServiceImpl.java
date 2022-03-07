@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 
 import Dao.Setting.UserDao;
 import Dao.workbench.activity.ActivityDao;
+import Dao.workbench.activity.ActivityRemarkDao;
 import Domain.Setting.User;
 import Domain.Setting.workbench.activity.Activity;
+import Domain.Setting.workbench.activity.ActivityRemark;
 import Services.workbench.activity.ActivityService;
 import Vo.Activity.PageVo;
 import Vo.Activity.PaginationVO;
@@ -19,9 +21,42 @@ import Vo.Activity.PaginationVO;
 public class ActivityServiceImpl implements ActivityService {
 	
 	@Autowired
+	private ActivityRemarkDao activityRemarkDao;
+	@Autowired
 	private ActivityDao activityDao;
 	@Autowired
 	private UserDao userDao;
+	
+	public Boolean deleteRemark(String id) {
+		Boolean flag = true;
+		int count = activityRemarkDao.deleteRemarkById(id);
+		if(count != 1) {
+			flag =false;
+		}
+		return flag;
+	}
+	
+	public Boolean updateRemark(ActivityRemark remark) {
+		Boolean flag = true;
+		int count = activityRemarkDao.updateRemark(remark);
+		if(count != 1) {
+			flag =false;
+		}
+		return flag;
+	}
+	
+	public Boolean saveRemark(ActivityRemark remark) {
+		Boolean flag = true;
+		int count = activityRemarkDao.saveRemark(remark);
+		if(count != 1) {
+			flag =false;
+		}
+		return flag;
+	}
+	
+	public List<ActivityRemark> getRemarkListByAid(String activityId) {
+		return activityRemarkDao.getRemarkListByAid(activityId);
+	}
 	
 	public Activity detail(String id) {
 		return activityDao.detail(id);

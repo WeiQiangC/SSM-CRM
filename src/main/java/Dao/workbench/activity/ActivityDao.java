@@ -4,6 +4,7 @@ import java.util.List;
 
 import Domain.Setting.User;
 import Domain.Setting.workbench.activity.Activity;
+import Domain.Setting.workbench.activity.ActivityRemark;
 import Vo.Activity.PageVo;
 
 public interface ActivityDao {
@@ -21,5 +22,7 @@ public interface ActivityDao {
 	int delete(String[] id);
 
 	Activity detail(String id);
+
+	List<ActivityRemark> getRemarkListByAid(String activityId);
 
 }

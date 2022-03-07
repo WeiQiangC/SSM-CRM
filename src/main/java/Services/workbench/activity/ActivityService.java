@@ -5,6 +5,7 @@ import java.util.Map;
 
 import Domain.Setting.User;
 import Domain.Setting.workbench.activity.Activity;
+import Domain.Setting.workbench.activity.ActivityRemark;
 import Vo.Activity.PageVo;
 import Vo.Activity.PaginationVO;
 
@@ -23,5 +24,13 @@ public interface ActivityService {
 	boolean delete(String[] id);
 
 	Activity detail(String id);
+
+	List<ActivityRemark> getRemarkListByAid(String activityId);
+
+	Boolean saveRemark(ActivityRemark remark);
+
+	Boolean updateRemark(ActivityRemark remark);
+
+	Boolean deleteRemark(String id);
 
 }

@@ -57,12 +57,6 @@
 		
 		showRemarkList();
 		
-		$("#remarkBody").on("mouseover",".remarkDiv",function(){
-			$(this).children("div").children("div").show();
-		});
-		$("#remarkBody").on("mouseout",".remarkDiv",function(){
-			$(this).children("div").children("div").hide();
-		});
 		
 		$("#saveRemarkBtn").click(function(){
 			$.ajax({
@@ -77,16 +71,16 @@
 					if(data.success){
 						$("#remark").val("");
 						var html="";
-					html+='<div id = "'+data.ar.id+'" class="remarkDiv" style="height: 60px;">';                                                                                                  
+					html+='<div id = '+data.ar.id+' class="remarkDiv" style="height: 60px;">';                                                                                                  
 					html+='<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';                                                      
 					html+='<div style="position: relative; top: -40px; left: 40px;" >';                                                                                      
-					html+='	<h5 id=e"'+data.ar.id+'">'+data.ar.noteContent+'</h5>';                                                                                                                                
-					html+='	<font color="gray">市场活动</font> <font color="gray">-</font> <b>${a.name}</b> <small id="s'+ n.id +'" style="color: gray;"> '+(data.ar.createTime)+' 由'+(data.ar.createBy)+'</smal>'; 
+					html+='	<h5 id=e'+data.ar.id+'>'+data.ar.noteContent+'</h5>';                                                                                                                                
+					html+='	<font color="gray">市场活动</font> <font color="gray">-</font> <b>${a.name}</b> <small id="s'+ data.ar.id +'" style="color: gray;"> '+(data.ar.createTime)+' 由'+(data.ar.createBy)+'</smal>'; 
 					html+='	<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px;">';                                          
-					html+='		<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+data.ar.id+'\')"> <span class="glyphicon glyphicon-edit" style="font-size: 100px; color: #FF0000;"> </span></a>';   
+					html+='		<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+data.ar.id+'\')"> <span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"> </span></a>';   
 					html+='&nbsp;&nbsp;&nbsp;&nbsp; ';                                                                                                                  
 					//对于动态生成的元素要绑定动态事件，必须将其套用在字符串中如\''+n.id+'\'
-					html+='	<a class="myHref" href="javascript:void(0);" onclick="deleteRemark(\''+data.ar.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 100px; color: #FF0000;"></span></a>'; 
+					html+='	<a class="myHref" href="javascript:void(0);" onclick="deleteRemark(\''+data.ar.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #FF0000;"></span></a>'; 
 					html+='	</div> ';                                                                                                                                        
 					html+='</div> ';                                                                                                                                         
 					html+='</div>'; 
@@ -111,8 +105,22 @@
 				dataType:"json",
 				success:function(data){
 					if(data.success){
-						$("#e"+id).html(data.ar.noteContent);
-						$("#s"+id).html(data.ar.editTime +"由" +data.ar.editBy);
+						var html = "";
+						$("#"+data.ar.id).html(html);
+						html+='<div id = '+data.ar.id+' class="remarkDiv" style="height: 60px;">';  
+						html+='<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';                                                      
+						html+='<div style="position: relative; top: -40px; left: 40px;" >';                                                                                      
+						html+='<h5 id=e'+data.ar.id+'>'+data.ar.noteContent+'</h5>';                                                                                                                                
+						html+='<font color="gray">市场活动</font> <font color="gray">-</font> <b>${a.name}</b> <small id="s'+ data.ar.id +'" style="color: gray;"> '+(data.ar.editFlag==0?data.ar.createTime:data.ar.editTime)+' 由'+(data.ar.editFlag==0?data.ar.createBy:data.ar.editBy)+'</smal>'; 
+						html+='<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px;">';                                          
+						html+='<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+data.ar.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';   
+						html+='&nbsp;&nbsp;&nbsp;&nbsp; ';                                                                                                                  
+						//对于动态生成的元素要绑定动态事件，必须将其套用在字符串中如\''+n.id+'\'
+						html+='<a class="myHref" href="javascript:void(0);" onclick="deleteRemark(\''+data.ar.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #FF0000;"></span></a>'; 
+						html+='</div> ';                                                                                                                                        
+						html+='</div> ';
+						html+='</div>'; 
+						$("#"+data.ar.id).html(html);
 						$("#editRemarkModal").modal("hide");
 					}
 					else{
@@ -135,10 +143,10 @@
 			success:function(data){
 				var html="";
 				$.each(data,function(i,n){
-					html+='<div id = "'+n.id+'" class="remarkDiv" style="height: 60px;">';                                                                                                  
+					html+='<div id = '+n.id+' class="remarkDiv" style="height: 60px;">';                                                                                                  
 					html+='<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';                                                      
 					html+='<div style="position: relative; top: -40px; left: 40px;" >';                                                                                      
-					html+='<h5 id=e"'+n.id+'">'+n.noteContent+'</h5>';                                                                                                                                
+					html+='<h5 id=e'+n.id+'>'+n.noteContent+'</h5>';                                                                                                                                
 					html+='<font color="gray">市场活动</font> <font color="gray">-</font> <b>${a.name}</b> <small id="s'+ n.id +'" style="color: gray;"> '+(n.editFlag==0?n.createTime:n.editTime)+' 由'+(n.editFlag==0?n.createBy:n.editBy)+'</smal>'; 
 					html+='<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px;">';                                          
 					html+='<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+n.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #FF0000;"></span></a>';   
