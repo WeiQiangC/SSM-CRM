@@ -11,7 +11,7 @@
 		</foreach> 
 	</delete>
 
-	<select id="detail" resultType="Domain.Setting.workbench.activity.Activity">
+	<select id="detail" resultType="Domain.workbench.activity.Activity">
 		select 
 		a.id,
 		u.name as owner,
@@ -41,7 +41,7 @@
 		where id = #{id}
 	</update>
 	
-	<select id="getById" resultType="Domain.Setting.workbench.activity.Activity">
+	<select id="getById" resultType="Domain.workbench.activity.Activity">
 		select * from tbl_activity where id = #{id}
 	</select>
 
@@ -63,7 +63,7 @@
 		</where>
 	</select>
 	
-	<select id="getActivityListByCondition" resultType="Domain.Setting.workbench.activity.Activity">
+	<select id="getActivityListByCondition" resultType="Domain.workbench.activity.Activity">
 		select a.id,a.name,u.name as owner,a.startDate,a.endDate from tbl_activity a join tbl_user u on a.owner = u.id
 		<where>
 			<if test="name != null and name != ''">

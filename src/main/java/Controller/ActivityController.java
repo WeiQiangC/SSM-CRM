@@ -12,9 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import Domain.Setting.User;
-import Domain.Setting.workbench.activity.Activity;
-import Domain.Setting.workbench.activity.ActivityRemark;
+
+import Domain.setting.User;
+import Domain.workbench.activity.Activity;
+import Domain.workbench.activity.ActivityRemark;
 import Services.workbench.activity.ActivityService;
 import Utils.DateTimeUtil;
 import Utils.UUIDUtil;
@@ -75,7 +76,6 @@ public class ActivityController {
 	@RequestMapping("/delete")
 	@ResponseBody
 	public Object delete(String[] id) {
-		System.out.println(id.toString());
 		boolean flag = activityService.delete(id);
 		JSONObject json = new JSONObject();
 		json.put("success", flag);

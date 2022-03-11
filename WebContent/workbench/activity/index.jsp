@@ -40,9 +40,6 @@
 
 		$("#addBtn").click(
 				function() {
-					
-					
-					
 					$.ajax({
 						url : "workbench/activity/getUserList.do",
 						type : "get",

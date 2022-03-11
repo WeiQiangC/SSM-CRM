@@ -1,4 +1,4 @@
-package Domain.Setting;
+package Domain.setting;
 
 public class User {
 	private String id;

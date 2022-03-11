@@ -30,7 +30,7 @@
 	delete from tbl_activity_remark where id=#{id}
 </delete>
 
-<select id="getRemarkListByAid" resultType="Domain.Setting.workbench.activity.ActivityRemark">
+<select id="getRemarkListByAid" resultType="Domain.workbench.activity.ActivityRemark">
 	select * from tbl_activity_remark where activityid = #{activityId};
 </select>
 

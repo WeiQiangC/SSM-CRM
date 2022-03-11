@@ -1,4 +1,4 @@
-package Domain.Setting.workbench.activity;
+package Domain.workbench.activity;
 
 public class Activity {
 	private String id;

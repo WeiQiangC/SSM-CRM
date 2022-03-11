@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     String basePath = request.getScheme() + "://"
             + request.getServerName() + ":" + request.getServerPort()
@@ -14,9 +15,137 @@
 
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+   $(function(){
+	   
+	   getUserList($("#pageNo").val(),$("#pageSize").val());
+	   getTotal();
+	   
+	   
+	   
+	   //为创建按钮绑定事件
+	   $("#createBtn").click(function(){
+		   $("#create-loginActNo").val("");
+		   $("#create-username").val("");
+		   $("#create-loginPwd").val("");
+		   $("#create-confirmPwd").val("");
+		   $("#create-email").val("");
+		   $("#create-expireTime").val("");
+		   $("#create-allowIps").val("");
+		   $("#createUserModal").modal("show");
+	   })
+   })
+   
+   //实现改变查询的记录数
+   function change(pageNo,pageSize){
+	var html = "";
+	$("#changeBtn").html("");
+	html+='<a  href="javascript:void(0);" onclick="change('+pageNo+','+pageSize+')" >'+pageSize+'</a>   ';
+	html+='<span class="caret"></span>';
+	$("#changeBtn").html(html);
+	$("#pageNo").val(pageNo);
+	$("#pageSize").val(pageSize);
+	getUserList($("#pageNo").val(),$("#pageSize").val());
+}
+   
+   //实现翻页
+   function beforePage(){
+	if($("#pageNo").val()==1){
+		alert("当前已经是最开始页!");
+	}else{
+		var pageNo = $("#pageNo").val()-1;
+		$("#pageNo").val(pageNo);
+		getUserList($("#pageNo").val(),$("#pageSize").val());
+	}
+}
+
+function afterPage(){
+	var pageNo = Math.ceil($("#total").val() /$("#pageSize").val()) ;
+	if($("#pageNo").val()==pageNo){
+		alert("当前已经是最后一页!");
+	}else{
+		pageNo =parseInt($("#pageNo").val())+1;
+		$("#pageNo").val(pageNo);
+		getUserList($("#pageNo").val(),$("#pageSize").val());
+	}
+}
+   
+   function changePage(pageNo){
+	   $("#pageNo").val(pageNo);
+	   getUserList($("#pageNo").val(),$("#pageSize").val());
+   }
+   
+   
+   function firstPage(){
+	$("#pageNo").val(1);
+	getUserList($("#pageNo").val(),$("#pageSize").val());
+}
+
+function lastPage(){
+	var pageNo = Math.ceil($("#total").val() /$("#pageSize").val()) ;
+	$("#pageNo").val(pageNo);
+	getUserList($("#pageNo").val(),$("#pageSize").val());
+}
+
+//获取总的记录条数
+   function getTotal(){
+	$.ajax({
+		url:"setting/qx/user/getUserTotal.do",
+		type:"get",
+		dataType:"json",
+		success:function(data){
+			$("#total").html(data);
+			$("#total").val(data);
+		}
+	})
+}
+   
+   //获取页面开始铺设的数据
+   function getUserList(pageNo,pageSize){
+	   
+		$.ajax({
+			url:"setting/qx/user/getUserList.do",
+			data:{
+				"pageNo":pageNo,
+				"pageSize":pageSize
+			},
+			type:"get",
+			dataType:"json",
+			success:function(data){
+				var html = "";
+				$.each(data,function(i,n){
+					var lockState = "";
+					if(n.lockState==1){
+						lockState = "启动";
+					}else{
+						lockState = "锁定";
+					}
+					html+=' <tr class="active" >';
+					html+='	<td><input type="checkbox" name="xz" value='+n.id+'/></td>';
+					html+='	<td>'+(i+1)+'</td>';
+					html+='	<td><a  href="settings/qx/user/detail.do?id='+n.id+'">'+n.loginAct+'</a></td>';
+					html+='	<td>'+n.name+'</td> ';
+					html+='	<td>'+n.deptno+'</td>';
+					html+='	<td>'+n.email+'</td>';
+					html+='	<td>'+n.expireTime+'</td>';
+					html+='	<td>'+n.allowIps+'</td>';
+					html+='	<td>'+lockState+'</td>';
+					html+='	<td>'+n.createBy+'</td>';
+					html+='	<td>'+n.createTime+'</td>';
+					html+='	<td>'+n.editBy+'</td>';
+					html+='	<td>'+n.editTime+'</td>';
+					html+='</tr>';
+				})
+				$("#userBody").html(html);
+				
+			}
+		})
+   }
+</script>
 </head>
 <body>
-
+	<input id="pageNo" value="1" type="hidden"/>	
+	<input id="pageSize" value="10" type="hidden"/>	
 	<!-- 创建用户的模态窗口 -->
 	<div class="modal fade" id="createUserModal" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 90%;">
@@ -66,7 +195,7 @@
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-lockStatus">
 								  <option></option>
-								  <option>启用</option>
+								  <option>启动</option>
 								  <option>锁定</option>
 								</select>
 							</div>
@@ -74,8 +203,9 @@
                             <div class="col-sm-10" style="width: 300px;">
                                 <select class="form-control" id="create-dept">
                                     <option></option>
-                                    <option>市场部</option>
-                                    <option>策划部</option>
+                                  <c:forEach items="${deptType}" var="d">
+								  	<option>${d.depeName}</option>
+								  </c:forEach>
                                 </select>
                             </div>
 						</div>
@@ -156,8 +286,8 @@
 	
 	<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;left: 30px; width: 110%; top: 20px;">
 		<div class="btn-group" style="position: relative; top: 18%;">
-		  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-		  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+		  <button type="button" class="btn btn-primary" data-toggle="modal" id="createBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+		  <button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 		</div>
 		
 	</div>
@@ -181,55 +311,26 @@
 					<td>修改时间</td>
 				</tr>
 			</thead>
-			<tbody>
-				<tr class="active">
-					<td><input type="checkbox" /></td>
-					<td>1</td>
-					<td><a  href="detail.html">zhangsan</a></td>
-					<td>张三</td>
-					<td>市场部</td>
-					<td>zhangsan@bjpowernode.com</td>
-					<td>2017-02-14 10:10:10</td>
-					<td>127.0.0.1,192.168.100.2</td>
-					<td>启用</td>
-					<td>admin</td>
-					<td>2017-02-10 10:10:10</td>
-					<td>admin</td>
-					<td>2017-02-10 20:10:10</td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" /></td>
-					<td>2</td>
-					<td><a  href="detail.html">lisi</a></td>
-					<td>李四</td>
-					<td>市场部</td>
-					<td>lisi@bjpowernode.com</td>
-					<td>2017-02-14 10:10:10</td>
-					<td>127.0.0.1,192.168.100.2</td>
-					<td>锁定</td>
-					<td>admin</td>
-					<td>2017-02-10 10:10:10</td>
-					<td>admin</td>
-					<td>2017-02-10 20:10:10</td>
-				</tr>
+			<tbody id="userBody">
 			</tbody>
 		</table>
 	</div>
 	
 	<div style="height: 50px; position: relative;top: 30px; left: 30px;">
 		<div>
-			<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
+			<button type="button" class="btn btn-default" style="cursor: default;">共<b id="total">50</b>条记录</button>
 		</div>
 		<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
 			<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
 			<div class="btn-group">
-				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="changeBtn">
 					10
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu" role="menu">
-					<li><a href="#">20</a></li>
-					<li><a href="#">30</a></li>
+					<li><a  href="javascript:void(0);" onclick="change(1,10)" >10</a></li>
+						<li><a  href="javascript:void(0);" onclick="change(1,20)" >20</a></li>
+						<li><a  href="javascript:void(0);" onclick="change(1,30)">30</a></li>
 				</ul>
 			</div>
 			<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
@@ -237,15 +338,15 @@
 		<div style="position: relative;top: -88px; left: 285px;">
 			<nav>
 				<ul class="pagination">
-					<li class="disabled"><a href="#">首页</a></li>
-					<li class="disabled"><a href="#">上一页</a></li>
-					<li class="active"><a href="#">1</a></li>
-					<li><a href="#">2</a></li>
-					<li><a href="#">3</a></li>
-					<li><a href="#">4</a></li>
-					<li><a href="#">5</a></li>
-					<li><a href="#">下一页</a></li>
-					<li class="disabled"><a href="#">末页</a></li>
+					<li> <a href="javascript:void(0);" onclick="firstPage()">首页</a></li>
+					<li ><a href="javascript:void(0);" onclick="beforePage()">上一页</a></li>
+					<li ><a href="javascript:void(0);" onclick="changePage(1)">1</a></li>
+					<li><a href="javascript:void(0);" onclick="changePage(2)">2</a></li>
+					<li><a href="javascript:void(0);" onclick="changePage(3)">3</a></li>
+					<li><a href="javascript:void(0);" onclick="changePage(4)">4</a></li>
+					<li><a href="javascript:void(0);" onclick="changePage(5)">5</a></li>
+					<li><a href="javascript:void(0);" onclick="afterPage()">下一页</a></li>
+					<li ><a href="javascript:void(0);" onclick="lastPage()">末页</a></li>
 				</ul>
 			</nav>
 		</div>

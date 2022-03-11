@@ -1,13 +1,16 @@
 package Services.impl.Setting;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Dao.Setting.UserDao;
-import Domain.Setting.User;
+import Domain.setting.Dept;
+import Domain.setting.DeptType;
+import Domain.setting.User;
 import Exception.LoginException;
 import Services.Setting.UserService;
 
@@ -16,6 +19,68 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	UserDao userDao;
+	
+	@Override
+	public List<DeptType> getTotalDeptType() {
+		return userDao.getTotalDeptType();
+	}
+	
+	@Override
+	public Integer getUserTotal() {
+		return userDao.getUserTotal();
+	}
+	
+	@Override
+	public List<User> getUserList(String pageNo, String pageSize) {
+		int start = Integer.valueOf(pageNo);
+		 int number = Integer.valueOf(pageSize);
+		 start = (start - 1)*number;
+		return userDao.getUserListByLimt(start,number);
+	}
+	
+	@Override
+	public Integer getTotal() {
+		List<Dept> dList = userDao.getTotal();
+		return dList.size();
+	}
+	
+	@Override
+	public Boolean delete(String[] id) {
+		
+		return userDao.delete(id);
+	}
+	
+	@Override
+	public Boolean editUpdate(Dept dept) {
+		Boolean flag = true;
+		int count = userDao.editUpdate(dept);
+		if(count != 1) {
+			flag = false;
+		}
+		return flag;
+	}
+	
+	@Override
+	public Dept getEditDept(String id) {
+		return userDao.getEditDept(id);
+	}
+	
+	@Override
+	public Boolean createDept(Dept dept) {
+		Boolean flag = true;
+		int count = userDao.createDept(dept);
+		if(count != 1) {
+			flag = false;
+		}
+		return flag;
+	}
+	
+	public List<Dept> pageList(String pageNo, String pageSize) {
+		 int start = Integer.valueOf(pageNo);
+		 int number = Integer.valueOf(pageSize);
+		 start = (start - 1)*number; 
+		 return userDao.pageList(start,number);
+	}
 	
 	public void updatePwd(String id, String newPwd) {
 		userDao.updatePwd(id,newPwd);

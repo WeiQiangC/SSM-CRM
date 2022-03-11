@@ -2,7 +2,7 @@ package Dao.workbench.activity;
 
 import java.util.List;
 
-import Domain.Setting.workbench.activity.ActivityRemark;
+import Domain.workbench.activity.ActivityRemark;
 
 
 public interface ActivityRemarkDao {

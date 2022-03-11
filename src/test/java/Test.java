@@ -2,7 +2,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import Controller.ActivityController;
-import Domain.Setting.workbench.activity.Activity;
+import Domain.workbench.activity.Activity;
 import Services.workbench.activity.ActivityService;
 import Utils.MD5Util;
 import Vo.Activity.PageVo;

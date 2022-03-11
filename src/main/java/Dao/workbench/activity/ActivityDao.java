@@ -2,9 +2,9 @@ package Dao.workbench.activity;
 
 import java.util.List;
 
-import Domain.Setting.User;
-import Domain.Setting.workbench.activity.Activity;
-import Domain.Setting.workbench.activity.ActivityRemark;
+import Domain.setting.User;
+import Domain.workbench.activity.Activity;
+import Domain.workbench.activity.ActivityRemark;
 import Vo.Activity.PageVo;
 
 public interface ActivityDao {
