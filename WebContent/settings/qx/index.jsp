@@ -42,14 +42,46 @@
 		//展示市场活动页面
 		window.open("settings/qx/user/index.jsp","workareaFrame");
 		
+		$("#update").click(function(){
+			if($.trim($("#newPwd").val())=="" || $.trim($("#oldPwd").val()) == "" || $.trim($("#confirmPwd").val())==""){
+				alert("输入不能为空");
+			}else{
+				if($("#newPwd").val() != $("#confirmPwd").val()){
+					alert("两次输入的新密码不一致,请重新输入")
+				}else{
+					$.ajax({
+						url:"setting/user/updatePwd.do",
+						data:{"newPwd":$("#newPwd").val(),"oldPwd":$("#oldPwd").val()},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							if(data.success){
+								alert("更新密码成功!请重新登录");
+								window.location.href='login.jsp';
+							}else{
+								alert("更新失败!请检查原密码是否正确")
+							}
+						}
+					})
+				}
+			}
+			
+		})
 	});
+	
+	function openEditPwdModal(){
+		$("#newPwd").val("");
+		$("#oldPwd").val("");
+		$("#confirmPwd").val("");
+		$("#editPwdModal").modal("show");
+	}
 	
 </script>
 
 </head>
 <body>
 
-<!-- 我的资料 -->
+	<!-- 我的资料 -->
 	<div class="modal fade" id="myInformation" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 30%;">
 			<div class="modal-content">
@@ -141,13 +173,13 @@
 	
 	<!-- 顶部 -->
 	<div id="top" style="height: 50px; background-color: #3C3C3C; width: 100%;">
-		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2017&nbsp;动力节点</span></div>
+		<div style="position: absolute; top: 5px; left: 0px; font-size: 30px; font-weight: 400; color: white; font-family: 'times new roman'">CRM &nbsp;<span style="font-size: 12px;">&copy;2020&nbsp;陈伟强</span></div>
 		<div style="position: absolute; top: 15px; right: 15px;">
 			<ul>
 				<li class="dropdown user-dropdown">
 					<a href="javascript:void(0)" style="text-decoration: none; color: white;" class="dropdown-toggle" data-toggle="dropdown">
-						<span class="glyphicon glyphicon-user"></span>${user.name}<span class="caret"></span>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<span class="glyphicon glyphicon-user"></span> ${user.name} <span class="caret"></span>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					</a>
 					<ul class="dropdown-menu">
 						<li><a href="workbench/index.jsp"><span class="glyphicon glyphicon-home"></span> 工作台</a></li>

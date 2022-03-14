@@ -11,18 +11,112 @@
 <head>
 <base href="<%=basePath%>">
 <meta charset="UTF-8">
+<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+<script type="text/javascript"src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript"src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 <script type="text/javascript">
    $(function(){
 	   
 	   getUserList($("#pageNo").val(),$("#pageSize").val());
 	   getTotal();
 	   
+	   $("#searchBtn").click(function(){
+		   $.ajax({
+				url:"setting/qx/user/searchUser.do",
+				data:{
+					"userName":$.trim($("#search-userName").val()),
+					"deptName":$.trim($("#search-deptName").val()),
+					"lockStatu":$.trim($("#search-lockStatu").find("option:selected").text()),
+					"startTime":$.trim($("#search-startTime").val()),
+					"endTime":$.trim($("#search-endTime").val())
+				},
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					var html = "";
+					$.each(data,function(i,n){
+						var lockState = "";
+						if(n.lockState==1){
+							lockState = "启动";
+						}else{
+							lockState = "锁定";
+						}
+						html+=' <tr class="active" >';
+						html+='	<td><input type="checkbox" name="xz" value='+n.id+'></td>';
+						html+='	<td>'+(i+1)+'</td>';
+						html+='	<td><a  href="settings/qx/user/detail.do?id='+n.id+'">'+n.loginAct+'</a></td>';
+						html+='	<td>'+n.name+'</td> ';
+						html+='	<td>'+n.deptno+'</td>';
+						html+='	<td>'+n.email+'</td>';
+						html+='	<td>'+n.expireTime+'</td>';
+						html+='	<td>'+n.allowIps+'</td>';
+						html+='	<td>'+lockState+'</td>';
+						html+='	<td>'+n.createBy+'</td>';
+						html+='	<td>'+n.createTime+'</td>';
+						html+='	<td>'+n.editBy+'</td>';
+						html+='	<td>'+n.editTime+'</td>';
+						html+='</tr>';
+					})
+					$("#userBody").html(html);
+				}
+			})
+	   })
 	   
+	   $("#qx").click(function(){
+			$("input[name=xz]").prop("checked",this.checked);
+		})
+		
+		$("#userBody").on("click",$("input[name = xz]"),function(){
+			$("#qx").prop("checked",$("input[name=xz]").length==$("input[name=xz]:checked").length);
+		})
 	   
+	   $(".time").datetimepicker({
+			minView:"month",
+			language:"zh-CN",
+			format:"yyyy-mm-dd",
+			autoclose:true,
+			todayBtn:true,
+			pickerPosition:"bottom-left"
+		})
+	   
+		$("#deleteBtn").click(function(){
+		var $xz = $("input[name=xz]:checked"); 
+		if($xz.length==0){
+			alert("请选择需要删除的记录");
+		}else{
+			//进行确认删除
+			if(confirm("确认删除所有选中的记录")){
+				var param = "";
+				 for(var i=0;i<$xz.length;i++){
+					 param += "id="+$($xz[i]).val();
+					 if(i<$xz.length-1){
+						 param += "&";
+					 }
+				 }
+			}
+			
+			$.ajax({
+				url:"setting/qx/user/deleteUser.do",
+				data:param,
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					if(data){
+						getUserList($("#pageNo").val(),$("#pageSize").val());
+					}else{
+						alert("删除市场活动失败");
+					}
+				}
+			})
+		}
+	})
+		
 	   //为创建按钮绑定事件
 	   $("#createBtn").click(function(){
 		   $("#create-loginActNo").val("");
@@ -33,6 +127,44 @@
 		   $("#create-expireTime").val("");
 		   $("#create-allowIps").val("");
 		   $("#createUserModal").modal("show");
+	   })
+	   
+	   //保存数据
+	   $("#saveBtn").click(function(){
+		   if($("#create-dept").find("option:selected").val()=="" || $.trim($("#create-loginPwd").val())=="" || $.trim($("#create-confirmPwd").val()) == "" || $.trim($("#create-loginActNo").val())==""){
+				alert("带*号的输入不能为空");
+			}else{
+				if($.trim($("#create-loginPwd").val()) == $.trim($("#create-confirmPwd").val())){
+					$.ajax({
+						url:"setting/qx/user/saveUser.do",
+						data:{
+						"loginAct":$("#create-loginActNo").val(),
+						"name": $("#create-username").val(),
+						"loginPwd":$("#create-loginPwd").val(),
+						"email":$("#create-email").val(),
+						"expireTime":$("#create-expireTime").val(),
+						"allowIps":$("#create-allowIps").val(),
+						"lockState":$("#create-lockStatus").val(),
+						"deptno":$("#create-dept option:selected").val(),
+						"editBy":"${user.name}"
+						},
+						type:"post",
+						dataType:"json",
+						success:function(data){
+							if(data){
+								alert("存储成功");
+								getUserList($("#pageNo").val(),$("#pageSize").val());
+								$("#createUserModal").modal("hide");
+							}else{
+								alert("存储失败");
+							}
+						}
+					})
+				}else{
+					alert("两次输入的密码必须一样");
+				}
+				 
+			}
 	   })
    })
    
@@ -102,7 +234,6 @@ function lastPage(){
    
    //获取页面开始铺设的数据
    function getUserList(pageNo,pageSize){
-	   
 		$.ajax({
 			url:"setting/qx/user/getUserList.do",
 			data:{
@@ -121,9 +252,9 @@ function lastPage(){
 						lockState = "锁定";
 					}
 					html+=' <tr class="active" >';
-					html+='	<td><input type="checkbox" name="xz" value='+n.id+'/></td>';
+					html+='	<td><input type="checkbox" name="xz" value='+n.id+'></td>';
 					html+='	<td>'+(i+1)+'</td>';
-					html+='	<td><a  href="settings/qx/user/detail.do?id='+n.id+'">'+n.loginAct+'</a></td>';
+					html+='	<td><a  href="setting/qx/user/detail.do?id='+n.id+'">'+n.loginAct+'</a></td>';
 					html+='	<td>'+n.name+'</td> ';
 					html+='	<td>'+n.deptno+'</td>';
 					html+='	<td>'+n.email+'</td>';
@@ -173,11 +304,11 @@ function lastPage(){
 						<div class="form-group">
 							<label for="create-loginPwd" class="col-sm-2 control-label">登录密码<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="password" class="form-control" id="create-loginPwd">
+								<input type="text" class="form-control" id="create-loginPwd">
 							</div>
 							<label for="create-confirmPwd" class="col-sm-2 control-label">确认密码<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="password" class="form-control" id="create-confirmPwd">
+								<input type="text" class="form-control" id="create-confirmPwd">
 							</div>
 						</div>
 						<div class="form-group">
@@ -185,9 +316,9 @@ function lastPage(){
 							<div class="col-sm-10" style="width: 300px;">
 								<input type="text" class="form-control" id="create-email">
 							</div>
-							<label for="create-expireTime" class="col-sm-2 control-label">失效时间</label>
+							<label for="create-expireTime" class="col-sm-2 control-label ">失效时间</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="create-expireTime">
+								<input type="text" class="form-control time" id="create-expireTime" >
 							</div>
 						</div>
 						<div class="form-group">
@@ -204,7 +335,7 @@ function lastPage(){
                                 <select class="form-control" id="create-dept">
                                     <option></option>
                                   <c:forEach items="${deptType}" var="d">
-								  	<option>${d.depeName}</option>
+								  	<option value="${d.deptId}">${d.depeName}</option>
 								  </c:forEach>
                                 </select>
                             </div>
@@ -219,7 +350,7 @@ function lastPage(){
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="saveBtn">保存</button>
 				</div>
 			</div>
 		</div>
@@ -240,21 +371,21 @@ function lastPage(){
 		  <div class="form-group">
 		    <div class="input-group">
 		      <div class="input-group-addon">用户姓名</div>
-		      <input class="form-control" type="text">
+		      <input class="form-control" type="text" id="search-userName">
 		    </div>
 		  </div>
 		  &nbsp;&nbsp;&nbsp;&nbsp;
 		  <div class="form-group">
 		    <div class="input-group">
 		      <div class="input-group-addon">部门名称</div>
-		      <input class="form-control" type="text">
+		      <input class="form-control" type="text" id="search-deptName">
 		    </div>
 		  </div>
 		  &nbsp;&nbsp;&nbsp;&nbsp;
 		  <div class="form-group">
 		    <div class="input-group">
 		      <div class="input-group-addon">锁定状态</div>
-			  <select class="form-control">
+			  <select class="form-control" id="search-lockStatu">
 			  	  <option></option>
 			      <option>锁定</option>
 				  <option>启用</option>
@@ -266,7 +397,7 @@ function lastPage(){
 		  <div class="form-group">
 		    <div class="input-group">
 		      <div class="input-group-addon">失效时间</div>
-			  <input class="form-control" type="text" id="startTime" />
+			  <input class="form-control time" type="text" id="search-startTime" />
 		    </div>
 		  </div>
 		  
@@ -274,11 +405,11 @@ function lastPage(){
 		  
 		  <div class="form-group">
 		    <div class="input-group">
-			  <input class="form-control" type="text" id="endTime" />
+			  <input class="form-control time" type="text" id="search-endTime" />
 		    </div>
 		  </div>
 		  
-		  <button type="submit" class="btn btn-default">查询</button>
+		  <button type="button" class="btn btn-default" id="searchBtn">查询</button>
 		  
 		</form>
 	</div>
@@ -296,7 +427,7 @@ function lastPage(){
 		<table class="table table-hover">
 			<thead>
 				<tr style="color: #B3B3B3;">
-					<td><input type="checkbox" /></td>
+					<td><input type="checkbox" id="qx"/></td>
 					<td>序号</td>
 					<td>登录帐号</td>
 					<td>用户姓名</td>

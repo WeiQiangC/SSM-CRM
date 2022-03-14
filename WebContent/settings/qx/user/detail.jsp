@@ -1,13 +1,20 @@
+<%@ page contentType="text/html; charset=UTF-8" deferredSyntaxAllowedAsLiteral="true"%> 
+<%
+    String basePath = request.getScheme() + "://"
+            + request.getServerName() + ":" + request.getServerPort()
+            + request.getContextPath() + "/";
+%>
 <!DOCTYPE html>
 <html>
 <head>
+<base href="<%=basePath%>">
 <meta charset="UTF-8">
-<link href="../../../jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<link href="../../../jquery/zTree_v3-master/css/zTreeStyle/zTreeStyle.css" type="text/css" rel="stylesheet" />
+<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+<link href="jquery/zTree_v3-master/css/zTreeStyle/zTreeStyle.css" type="text/css" rel="stylesheet" />
 
-<script type="text/javascript" src="../../../jquery/jquery-1.11.1-min.js"></script>
-<script type="text/javascript" src="../../../jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../../../jquery/zTree_v3-master/js/jquery.ztree.all.min.js"></script>
+<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
+<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="jquery/zTree_v3-master/js/jquery.ztree.all.min.js"></script>
 
 <SCRIPT type="text/javascript">
 	var setting = {
@@ -18,10 +25,56 @@
 		}
 	};
 
+	$(function(){
+		$("#editBtn").click(function(){
+			$("#edit-loginActNo").val("${u.loginAct}");
+			$("#edit-username").val("${u.name}");
+			$("#edit-loginPwd").val("");
+			$("#edit-confirmPwd").val("");
+			$("#edit-email").val("${u.email}");
+			$("#edit-expireTime").val("${u.expireTime}");
+			$("#edit-lockStatus").val("${u.lockState}");
+			$("#create-org").val("${u.deptno}");
+			$("#edit-allowIps").val("${u.allowIps}");
+			$("#editUserModal").modal("show");
+		})
+		
+		$("#edit-update").click(function(){
+			if($.trim($("#edit-loginPwd").val()) == "" || $.trim($("#edit-confirmPwd").val())==""){
+				alert("密码和确认密码不能为空");
+			}else if($.trim($("#edit-loginPwd").val()) !=  $.trim($("#edit-confirmPwd").val())){
+				alert("两次输入的密码不一致");
+			}else{
+				$.ajax({
+					url:"setting/qx/user/detailUpdate.do",
+					data:{
+						"loginAct":$("#edit-loginActNo").val(),
+						"name":$("#edit-username").val(),
+						"loginPwd":$("#edit-loginPwd").val(),
+						"email":$("#edit-email").val(),
+						"expireTime":$("#edit-expireTime").val(),
+						"lockState":$("#edit-lockStatus").val(),
+						"deptno":$("#create-org").val(),
+						"allowIps":$("#edit-allowIps").val(),
+						"id":"${u.id}",
+						"editBy":"${user.name}"
+					},
+					type:"post",
+					dataType:"json",
+					success:function(data){
+						if(data){
+							alert("修改成功!");
+							$("#editUserModal").modal("hide");
+							window.location.href="setting/qx/user/detail.do?id=${u.id}"
+						}else{
+							alert("修改失败");
+						}
+					}
+				})
+			}
+		})
+	})
 	
-	$(document).ready(function(){
-		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
-	});
 	
 </SCRIPT>
 
@@ -171,7 +224,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="edit-update">更新</button>
 				</div>
 			</div>
 		</div>
@@ -180,7 +233,7 @@
 	<div>
 		<div style="position: relative; left: 30px; top: -10px;">
 			<div class="page-header">
-				<h3>用户明细 <small>张三</small></h3>
+				<h3>用户明细 <small>${u.name}</small></h3>
 			</div>
 			<div style="position: relative; height: 50px; width: 250px;  top: -72px; left: 80%;">
 				<button type="button" class="btn btn-default" onclick="window.history.back();"><span class="glyphicon glyphicon-arrow-left"></span> 返回</button>
@@ -195,39 +248,39 @@
 				<div style="position: relative; top: 20px; left: -30px;">
 					<div style="position: relative; left: 40px; height: 30px; top: 20px;">
 						<div style="width: 300px; color: gray;">登录帐号</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>zhangsan</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.loginAct}</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 40px;">
 						<div style="width: 300px; color: gray;">用户姓名</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>张三</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.name }</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 60px;">
 						<div style="width: 300px; color: gray;">邮箱</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>zhangsan@bjpowernode.com</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.email }</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 80px;">
 						<div style="width: 300px; color: gray;">失效时间</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>2017-02-14 10:10:10</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.expireTime }</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 100px;">
 						<div style="width: 300px; color: gray;">允许访问IP</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>127.0.0.1,192.168.100.2</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.allowIps }(暂时禁用)</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 120px;">
 						<div style="width: 300px; color: gray;">锁定状态</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>启用</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.lockState }</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
 					</div>
 					<div style="position: relative; left: 40px; height: 30px; top: 140px;">
 						<div style="width: 300px; color: gray;">部门名称</div>
-						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>市场部</b></div>
+						<div style="width: 500px;position: relative; left: 200px; top: -20px;"><b>${u.deptno }</b></div>
 						<div style="height: 1px; width: 600px; background: #D5D5D5; position: relative; top: -20px;"></div>
-						<button style="position: relative; left: 76%; top: -40px;" type="button" class="btn btn-default" data-toggle="modal" data-target="#editUserModal"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
+						<button style="position: relative; left: 76%; top: -40px;" type="button" class="btn btn-default" data-toggle="modal" id="editBtn"><span class="glyphicon glyphicon-edit"></span> 编辑</button>
 					</div>
 				</div>
 			</div>

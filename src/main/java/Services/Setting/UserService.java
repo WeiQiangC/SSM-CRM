@@ -30,6 +30,18 @@ public interface UserService {
 	public Integer getUserTotal();
 
 	public List<DeptType> getTotalDeptType();
+
+	public Boolean saveUser(User user);
+
+	public Boolean deleteUser(String[] id);
+
+	public List<User> searchUser(String userName, String deptName, String lockStatu, String startTime, String endTime);
+
+	public User getUserById(String id);
+
+	public boolean detailUpdate(User user);
+
+	public String getDeptByName(String deptName);
 	
 	
 	

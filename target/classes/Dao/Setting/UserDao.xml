@@ -2,6 +2,115 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Dao.Setting.UserDao">
 
+<update id="detailUpdate">
+	update tbl_user set 
+	loginAct    =#{loginAct},
+	name        =#{name},
+	loginPwd    =#{loginPwd},
+	email       =#{email},
+	expireTime  =#{expireTime},
+	lockState   =#{lockState},
+	deptno      =#{deptno},
+	allowIps    =#{allowIps},
+	editTime    =#{editTime},
+	editBy      =#{editBy}
+	where id = #{id}
+</update>
+
+<select id="getDeptByName" resultType="String">
+	select deptId from tbl_dept_type where depeName = #{deptName}
+</select>
+
+<select id="getUserById" resultType="Domain.setting.User">
+	select 
+		user.id                       ,
+        user.loginAct                 ,
+        user.name                     ,
+        user.loginPwd                 ,
+        user.email                    ,
+        user.expireTime               ,
+        user.lockState                ,
+        dept.depeName as deptno       ,
+        user.allowIps                 ,
+        user.createTime               ,
+        user.createBy                 ,
+        user.editTime                 ,
+        user.editBy
+	 from tbl_user user join tbl_dept_type dept on user.deptno = dept.deptId
+	 where user.id = #{id}
+</select>
+
+	<select id="searchUser" resultType="Domain.setting.User">
+		select 
+		user.id                       ,
+        user.loginAct                 ,
+        user.name                     ,
+        user.loginPwd                 ,
+        user.email                    ,
+        user.expireTime               ,
+        user.lockState                ,
+        dept.depeName as deptno         ,
+        user.allowIps                 ,
+        user.createTime               ,
+        user.createBy                 ,
+        user.editTime                 ,
+        user.editBy
+		 from tbl_user user join tbl_dept_type dept on user.deptno = dept.deptId
+		<where>
+			<if test="userName != null and userName != ''">
+				user.name like '%' #{userName} '%'
+			</if>
+			<if test="deptName != null and deptName != ''">
+				and dept.depeName like '%' #{deptName} '%'
+			</if>
+			<if test="lockStatu != null and lockStatu != ''">
+				and user.lockState = #{lockStatu}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				and user.expireTime &gt;= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				and user.expireTime &lt;= #{endTime}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deleteUser">
+		delete from tbl_user 
+		where id in 
+		<foreach collection="array" open="("  close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+
+	<insert id="saveUser">
+	insert into tbl_user(
+	id ,
+	loginAct ,
+	name ,
+	loginPwd ,
+	email ,
+	expireTime ,
+	lockState ,
+	deptno ,
+	allowIps ,
+	createTime ,
+	createBy
+	)values(
+	#{id } ,
+	#{loginAct } ,
+	#{name } ,
+	#{loginPwd } ,
+	#{email } ,
+	#{expireTime } ,
+	#{lockState } ,
+	#{deptno } ,
+	#{allowIps } ,
+	#{createTime } ,
+	#{createBy}
+	)
+	</insert>
+
 	<select id="getTotalDeptType" resultType="Domain.setting.DeptType">
 		select * from tbl_dept_type
 	</select>

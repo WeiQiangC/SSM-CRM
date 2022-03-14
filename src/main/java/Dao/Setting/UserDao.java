@@ -35,5 +35,17 @@ public interface UserDao {
 
 	List<DeptType> getTotalDeptType();
 
+	int saveUser(User user);
+
+	Boolean deleteUser(String[] id);
+
+	List<User> searchUser(@Param("userName")String userName,@Param("deptName") String deptName,@Param("lockStatu") String lockStatu,@Param("startTime") String startTime,@Param("endTime") String endTime);
+
+	User getUserById(String id);
+
+	boolean detailUpdate(User user);
+
+	String getDeptByName(String deptName);
+
 
 }

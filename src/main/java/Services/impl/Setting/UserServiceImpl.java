@@ -21,6 +21,40 @@ public class UserServiceImpl implements UserService {
 	UserDao userDao;
 	
 	@Override
+	public boolean detailUpdate(User user) {
+		return userDao.detailUpdate(user);
+	}
+	
+	@Override
+	public String getDeptByName(String deptName) {
+		return userDao.getDeptByName(deptName);
+	}
+	@Override
+	public User getUserById(String id) {
+		return userDao.getUserById(id);
+	}
+	
+	@Override
+	public List<User> searchUser(String userName, String deptName, String lockStatu, String startTime, String endTime) {
+		return userDao.searchUser(userName,deptName,lockStatu,startTime,endTime);
+	}
+	
+	@Override
+	public Boolean deleteUser(String[] id) {
+		return userDao.deleteUser(id);
+	}
+	
+	@Override
+	public Boolean saveUser(User user) {
+		Boolean flag = true;
+		int count = userDao.saveUser(user);
+		if(count != 1) {
+			flag = false;
+		}
+		return flag;
+	}
+	
+	@Override
 	public List<DeptType> getTotalDeptType() {
 		return userDao.getTotalDeptType();
 	}

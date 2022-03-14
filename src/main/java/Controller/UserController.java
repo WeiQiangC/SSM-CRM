@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,6 +27,70 @@ public class UserController {
 	
 	@Autowired
 	UserService userService;	
+	
+	@RequestMapping("/qx/user/detailUpdate")
+	@ResponseBody
+	public boolean detailUpdate(User user,HttpServletRequest request) {
+		user.setLoginPwd(MD5Util.getMD5(user.getLoginPwd()));
+		user.setEditTime(DateTimeUtil.getSysTime());
+		user.setDeptno(userService.getDeptByName(user.getDeptno()));
+		if ("启用".equals(user.getLockState())) {
+			user.setLockState("1");
+		}else if("锁定".equals(user.getLockState())) {
+			user.setLockState("0");
+		}else {
+			user.setLockState("1");
+		}
+		return userService.detailUpdate(user);
+	}
+	
+	@RequestMapping("/qx/user/detail")
+	public Object detail(String id,Model model) {
+		User u = userService.getUserById(id);
+		if("0".equals(u.getLockState())) {
+			u.setLockState("锁定");
+		}else {
+			u.setLockState("启用");
+		}
+		model.addAttribute("u",u);
+		return "/settings/qx/user/detail.jsp";
+	}
+	
+	@RequestMapping("/qx/user/searchUser")
+	@ResponseBody
+	public Object searchUser(String userName,String deptName,String lockStatu,String startTime,String endTime) {
+		if ("启用".equals(lockStatu)) {
+			lockStatu = "1";
+		}else if ("锁定".equals(lockStatu)) {
+			lockStatu = "0";
+		}
+		List<User> uList = userService.searchUser(userName,deptName,lockStatu,startTime,endTime);
+		return uList;
+	}
+	
+	@RequestMapping("/qx/user/deleteUser")
+	@ResponseBody
+	public boolean deleteUser(String[] id) {
+		Boolean flag = userService.deleteUser(id);
+		return flag;
+	}
+	
+	@RequestMapping("/qx/user/saveUser")
+	@ResponseBody
+	public boolean saveUser(User user,HttpServletRequest request) {
+		user.setId(UUIDUtil.getUUID());
+		if("启动".equals(user.getLockState())) {
+			user.setLockState("1");
+		}else if("锁定".equals(user.getLockState())) {
+			user.setLockState("0");
+		}else {
+			user.setLockState("1");
+		}
+		user.setCreateBy(((User)request.getSession().getAttribute("user")).getName());
+		user.setCreateTime(DateTimeUtil.getSysTime());
+		Boolean flag = userService.saveUser(user);
+		return flag;
+	}
 	
 	@RequestMapping("/qx/user/getUserTotal")
 	@ResponseBody
